@@ -1,0 +1,259 @@
+
+/***头文件***/
+#include <stdio.h>
+#include <malloc.h>
+#define MaxSize 20
+#define MaxWidth 40
+typedef char ElemType;
+typedef struct node
+{
+	ElemType data;
+	struct node *lchild;
+	struct node *rchild;
+}
+BTNode;
+/***创建二叉树***/
+void GreateBTree(BTNode * &b,char *str)
+{
+	BTNode * St[MaxSize],*p;
+	int top=-1,k,j=0;
+	char ch;
+	b=NULL;
+	ch=str[j];
+	while (ch!='\0')
+	{
+		switch(ch)
+		{
+		case '(':top++;St[top]=p;k=1;break;
+		case')':top--;break;
+		case',':k=2;break;
+		default:p=(BTNode *)malloc(sizeof(BTNode));
+			p->data=ch;
+			p->lchild=p->rchild=NULL;
+			if (b==NULL)
+				b=p;
+			else
+			{
+				switch(k)
+				{
+				case 1:St[top]->lchild=p;break;
+				case 2:St[top]->rchild=p;break;
+				}
+			}
+		}
+		j++;
+		ch=str[j];
+	}
+}
+/***销毁二叉树***/
+void DestroyBTree(BTNode *&b)
+{ 
+	if (b!=NULL)
+	{
+		DestroyBTree (b->lchild);
+		DestroyBTree (b->rchild);
+		free(b);
+	}
+}
+void DispBTree(BTNode *b)
+{
+	if(b!=NULL)
+	{  
+		printf("%c",b->data);
+		if(b->lchild!=NULL||b->rchild!=NULL)
+		{
+			printf("(");
+			DispBTree(b->lchild);
+			if(b->rchild!=NULL)printf(",");
+			DispBTree(b->rchild);
+			printf(")");
+		}
+	}
+}
+//以凹入表表示法输出一棵二叉树
+void DispBTree1(BTNode *b)  
+{
+	BTNode *St[MaxSize],*p;   //以St数组模拟栈的功能，用top下标控制
+	int level[MaxSize][2],top=-1,n,i,width=4; //level数组表示top所指节点的水平线画法
+	char type;
+	if (b!=NULL)
+	{
+		top++;
+		St[top]=b;      //根结点入栈
+		level[top][0]=width;
+		level[top][1]=2;    //2表示是根
+		while (top>-1)
+		{
+			p=St[top];     //退栈并凹入显示该结点值
+			n=level[top][0];
+			switch(level[top][1])
+			{
+			case 0:type='L';break;  //左结点之后输出(L)
+			case 1:type='R';break;  //右结点之后输出(R)
+			case 2:type='B';break;  //根结点之后前输出(B)
+			}
+			for (i=1;i<=n;i++)   //其中n为显示场宽,字符以右对齐显示
+				printf(" ");           //该行已经打印了n个空格
+			printf("%c(%c)",p->data,type);
+			for (i=n+1;i<=MaxWidth;i+=2) //该行第n+1的位置开始打印--
+				printf("--");
+			printf("\n");        //注意每个节点线条占一行
+			top--;
+			if (p->rchild!=NULL)
+			{       //将右子树根结点入栈
+				top++;
+				St[top]=p->rchild;
+				level[top][0]=n+width; //显示场宽增width
+				level[top][1]=1;  //1表示是右子树
+			}
+			if (p->lchild!=NULL)
+			{       //将左子树根结点入栈
+				top++;
+				St[top]=p->lchild;
+				level[top][0]=n+width;  //显示场宽增width
+				level[top][1]=0;        //0表示是左子树
+			}
+		}
+	}
+}
+void PreOrder(BTNode *b)//先序遍历递归算法
+{
+	if (b!=NULL)
+	{
+		printf("%c",b->data);
+		PreOrder(b->lchild);
+		PreOrder(b->rchild);
+	}
+}
+void InOrder(BTNode *b)//中序遍历递归算法
+{
+	if (b!=NULL)
+	{
+		InOrder(b->lchild);
+		printf("%c",b->data);
+		InOrder(b->rchild);
+	}
+}
+void PostOrder(BTNode *b)//后序遍历递归算法
+{
+	if (b!=NULL)
+	{
+		PostOrder(b->lchild);
+		PostOrder(b->rchild);
+		printf("%c",b->data);
+	}
+}
+
+int Nodes(BTNode *b)//统计结点个数
+{
+	if(b==NULL)
+		return 0;
+	else
+		return Nodes(b->lchild)+Nodes(b->rchild)+1;
+}
+
+
+void DispLeaf(BTNode *b,int &i)//叶子结点个数
+{
+	if (b!=NULL)
+	{
+		if(b->lchild==NULL&&b->rchild==NULL)
+			i++;
+		
+		DispLeaf(b->lchild,i);
+		DispLeaf(b->rchild,i);
+	}
+}
+ 
+
+void Knodes(BTNode *b,int h,int k,int &n)//打印k层结点，n记录个数
+{
+	if(b==NULL)
+		return;
+	else
+	{
+		if(h==k)
+		{ 
+			n++;printf("%c",b->data);
+		}
+		else if(h<k)
+		{
+			Knodes(b->lchild,h+1,k,n);
+            Knodes(b->rchild,h+1,k,n);
+		}
+	}
+}
+
+
+void KLeafnodes(BTNode *b,int h,int k,int &nl)//打印k层叶子结点，nl记录个数
+{
+	if(b==NULL)
+		return;
+	else
+	{
+		if(b->lchild==NULL&&b->rchild==NULL){if(h==k){ nl++;printf("%c",b->data);}}
+		else if(h<k)
+		{
+			KLeafnodes(b->lchild,h+1,k,nl);
+            KLeafnodes(b->rchild,h+1,k,nl);
+		}
+	}
+}
+
+/*************************数组A储存k层所有结点，Al记录个数*********************************************************/
+/*************************数组B储存k层叶子结点，Bl记录个数*********************************************************/
+void K_Nodes(BTNode *b,int h,int k,ElemType A[],ElemType B[],int &Al,int &Bl)
+{
+	if(b==NULL)
+		return;
+	else
+	{
+		if(h==k)
+		{
+			A[Al++]=b->data;
+			if(b->lchild==NULL&&b->rchild==NULL)
+			{
+					B[Bl++]=b->data;
+			}
+		}
+		else if(h<k)
+		{
+			K_Nodes(b->lchild,h+1,k,A,B,Al,Bl);
+            K_Nodes(b->rchild,h+1,k,A,B,Al,Bl);
+		}
+	}
+}
+
+/*************************打印数组a储存al记录个数*********************************************************/
+void DISP_K_Nodes(ElemType a[],int al)
+{
+	printf("%d个",al);
+	int i=0;
+	printf(" 分别是:");
+	for(i=0;i<al;i++) printf("%c",a[i]);
+}
+
+
+void AllPath1(BTNode *b,ElemType path[],int pathlen)
+//采用先序遍历方法输出所有从叶子结点到根结点的路径（即叶子->根）
+//path记录从根到叶子经过的结点，pathlen从0开始
+
+{
+	if (b!=NULL)
+	{
+		if(b->lchild==NULL&&b->rchild==NULL)	//b为叶子结点，则打印叶子到根的路径，//即打印path数组中的值。
+		{
+			printf("	%c到根结点逆路径: %c->",b->data,b->data);
+			for (int i=pathlen-1;i>0;i--)
+				printf("%c->",path[i]);
+			printf("%c\n",path[0]);
+		}
+		else
+		{
+			path[pathlen]=b->data;	//将当前结点放入路径中
+			pathlen++;					//路径长度增1
+			AllPath1(b->lchild,path,pathlen);	//递归扫描左子树
+			AllPath1(b->rchild,path,pathlen);	//递归扫描右子树
+		}
+	}
+}
