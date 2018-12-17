@@ -1,0 +1,60 @@
+/***源文件***/
+#include "bt.h"
+void main()
+{	ElemType path[20];
+	int K=3,Kyezi=0,n=0,yezi=0,pathlen=0;
+	BTNode *b;
+	char str[]="A(B(D,E(H,I(L(M(N,),),))),C(F,G(J(O,),K)))";
+	printf("1,创建二叉链:\n");
+	
+	GreateBTree(b,str);
+	printf("2,用括号表示法输出二叉树:\n");
+	DispBTree(b);
+
+	printf("\n");
+	printf("3,用凹入表表示法输出一棵二叉树\n");
+	DispBTree1(b);
+	
+	printf("4,先序,中序,后序遍历:\n");
+	PreOrder(b);
+	printf("\n");
+	InOrder(b);
+	printf("\n");
+	PostOrder(b);
+	printf("\n");
+
+	printf("5,该二叉树的总结点个数:%d\n",Nodes(b));
+	
+	DispLeaf(b,yezi);
+	printf("6,该二叉树的叶子结点个数:%d\n",yezi);
+		
+	int n1=0;
+	printf("7,该二叉树第K=3层结点有分别为:");
+	Knodes(b,1,3,n1);
+	printf("	该层结点个数n为%d",n1);
+
+	ElemType a[20],a1[20];
+	int l=0,l1=0;
+	K_Nodes(b,1,3,a,a1,l,l1 );
+	printf("\n7优化,该二叉树第K=3层的结点有");
+	DISP_K_Nodes(a,l);
+	printf("\n	其中叶子结点有");
+	DISP_K_Nodes(a1,l1);
+
+	printf("\n");
+	K=4;
+	printf("8,该二叉树第K=4层叶子结点有分别为:");
+	KLeafnodes(b,1,K,Kyezi);
+	printf("	该层叶子结点个数为%d",Kyezi);
+	
+	printf("\n");
+
+	printf("9,该二叉树所有从叶子到根结点的路径依次为:\n");
+	AllPath1(b,path,pathlen);
+
+
+
+
+	printf("\n10,释放二叉树\n");
+	DestroyBTree(b);
+}
